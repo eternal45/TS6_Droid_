@@ -6,7 +6,6 @@ on:
       - main
       - master
   pull_request:
-  workflow_dispatch: # 💡 额外赠送：允许你在 GitHub 页面上手动点击按钮触发编译
 
 jobs:
   build:
@@ -14,62 +13,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 把汉化后的安卓项目本体克隆到 TS6_Droid 目录中
-      - name: Checkout Android Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          path: TS6_Droid
 
-      # 2. 💡 绝杀：同步克隆隔壁的官方 tslib 协议组件到同级目录 (../tslib)
-      - name: Checkout tslib (Crucial Dependency)
-        uses: actions/checkout@v4
-        with:
-          repository: teamspeaksystems/tslib
-          path: tslib
-
-      # 3. 设置 JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # 4. 💡 绝杀：在云端配置好 Rust 工具链
-      - name: Set up Rust Toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Set up Android SDK
+        uses: google-github-actions/setup-android@v3
         with:
-          toolchain: stable
-          target: aarch64-linux-android # 国内安卓手机最核心的 CPU 架构
+          api-level: 35
+          build-tools: 35.0.0
+          ndk: 27.2.12479018
+          components: |
+            platform-tools
+            platforms;android-35
+          cache: gradle
 
-      # 5. 💡 绝杀：安装 cargo-ndk 混合编译桥接器
-      - name: Install cargo-ndk
-        run: cargo install cargo-ndk
-
-      # 6. 设置 Android SDK 与特定版本的 NDK (r27b)
-      - name: Set up Android SDK & NDK
-        uses: android-actions/setup-android@v4
-        id: setup-android
-        with:
-          packages: 'ndk;27.2.12479018' # 锁定项目要求的 NDK 27.x 版本
-          cache-disabled: false
-
-      # 7. 赋予 Gradle 运行权限
       - name: Ensure Gradle wrapper is executable
-        run: chmod +x ./TS6_Droid/gradlew
+        run: chmod +x ./gradlew
 
-      # 8. 💡 真正合体的打包编译命令
-      - name: Build Combined Debug APK (Rust + Android)
-        run: |
-          cd TS6_Droid
-          ./gradlew --no-daemon assembleDebug
-        env:
-          # 💡 强制将云端下载好的物理 NDK 路径喂给编译进程，防止 Rust 报错
-          ANDROID_NDK: ${{ steps.setup-android.outputs.ANDROID_HOME }}/ndk/27.2.12479018
-          CMAKE_POLICY_VERSION_MINIMUM: "3.5"
-
-      # 9. 💡 绝杀：编译成功后把 APK 捞出来，供你在网页端直接点击下载
-      - name: Upload Finished APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: TS6-Han-Android-App
-          path: TS6_Droid/app/build/outputs/apk/debug/app-debug.apk
+      - name: Build Debug APK
+        run: ./gradlew --no-daemon assembleDebug
