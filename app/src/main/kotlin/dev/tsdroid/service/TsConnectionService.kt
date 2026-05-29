@@ -45,11 +45,15 @@ import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import dev.tsdroid.MainActivity
 import dev.tsdroid.R
 import dev.tsdroid.TsDroidApp
 import dev.tsdroid.bridge.AudioBridge
+import dev.tsdroid.bridge.AvatarCache
 import dev.tsdroid.bridge.TsClient
 import dev.tslib.Identity
 import dev.tslib.Channel
@@ -103,7 +107,10 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
     private var overlayChannelName by mutableStateOf<String?>(null)
     private var overlayActiveSpeakerId by mutableStateOf<Int?>(null)
     private var overlayActiveSpeakerName by mutableStateOf<String?>(null)
+    private var overlayActiveSpeakerAvatar by mutableStateOf<ImageBitmap?>(null)
     
+    private lateinit var avatarCache: AvatarCache
+
     // Overlay state
     private var isOverlayExpanded by mutableStateOf(false)
     
@@ -115,6 +122,7 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
         Log.d(TAG, "Foreground Service Created")
         savedStateRegistryController.performRestore(null)
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        avatarCache = AvatarCache(applicationContext.cacheDir)
         audioBridge = AudioBridge(applicationContext, tsClient)
         audioBridge.initialize()
 
@@ -136,6 +144,21 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
                     if (speakerId != null && speakerId != tsClient.clientId) {
                         overlayActiveSpeakerId = speakerId
                         overlayActiveSpeakerName = findUserNickname(speakerId)
+                        val speakerUser = tsClient.users.value.find { it.id == speakerId }
+                        val uid = speakerUser?.uid
+                        if (!uid.isNullOrEmpty()) {
+                            serviceScope.launch(Dispatchers.IO) {
+                                avatarCache.loadAvatar(uid, tsClient)
+                                val avatar = avatarCache.getAvatar(uid)
+                                withContext(Dispatchers.Main) {
+                                    if (overlayActiveSpeakerId == speakerId) {
+                                        overlayActiveSpeakerAvatar = avatar
+                                    }
+                                }
+                            }
+                        } else {
+                            overlayActiveSpeakerAvatar = null
+                        }
                     }
                 }
                 "talk_status_stop" -> {
@@ -143,6 +166,7 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
                     if (speakerId != null && speakerId == overlayActiveSpeakerId) {
                         overlayActiveSpeakerId = null
                         overlayActiveSpeakerName = null
+                        overlayActiveSpeakerAvatar = null
                     }
                 }
             }
@@ -323,6 +347,7 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
                     connected = overlayConnected,
                     channelName = overlayChannelName,
                     activeSpeakerName = overlayActiveSpeakerName,
+                    activeSpeakerAvatar = overlayActiveSpeakerAvatar,
                     isExpanded = isOverlayExpanded,
                     onToggleExpand = { isOverlayExpanded = !isOverlayExpanded },
                     onDrag = { dx, dy ->
@@ -394,6 +419,7 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
         connected: Boolean,
         channelName: String?,
         activeSpeakerName: String?,
+        activeSpeakerAvatar: ImageBitmap?,
         isExpanded: Boolean,
         onToggleExpand: () -> Unit,
         onDrag: (Float, Float) -> Unit,
@@ -439,12 +465,21 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
                         // Render Avatar Circle + Mini Speaker Waveform Indicator
                         if (!activeSpeakerName.isNullOrEmpty()) {
                             // Have speaker: Show user avatar
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = "Active Speaker",
-                                tint = Color.White,
-                                modifier = Modifier.align(Alignment.Center)
-                            )
+                            if (activeSpeakerAvatar != null) {
+                                androidx.compose.foundation.Image(
+                                    bitmap = activeSpeakerAvatar,
+                                    contentDescription = "Active Speaker Avatar",
+                                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = "Active Speaker",
+                                    tint = Color.White,
+                                    modifier = Modifier.align(Alignment.Center)
+                                )
+                            }
                         } else {
                             // No speaker: Show software logo
                             androidx.compose.foundation.Image(

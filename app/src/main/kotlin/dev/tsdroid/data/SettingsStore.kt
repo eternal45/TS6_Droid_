@@ -32,7 +32,7 @@ class SettingsStore(private val context: Context) {
         .map { it[KEY_LANGUAGE] ?: "zh" }
 
     val enableFloatingWindow: Flow<Boolean> = context.settingsDataStore.data
-        .map { it[KEY_ENABLE_FLOATING_WINDOW] ?: true }
+        .map { it[KEY_ENABLE_FLOATING_WINDOW] ?: false }
 
     suspend fun setAudioGain(gain: Float) {
         context.settingsDataStore.edit { it[KEY_AUDIO_GAIN] = gain }

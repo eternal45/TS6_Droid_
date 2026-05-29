@@ -52,8 +52,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onStart: hiding floating window")
-        connectionViewModel.hideFloatingWindow()
+        // Do not hide floating window here, letting it persist if enabled and shown
     }
 
     override fun onStop() {
