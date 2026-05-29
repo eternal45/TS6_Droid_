@@ -111,15 +111,6 @@ class ConnectionViewModel(application: Application) : AndroidViewModel(applicati
         _connectionState.value = ConnectionState.CONNECTING
         _error.value = null
 
-        val context = getApplication<Application>()
-        try {
-            TsConnectionService.start(context)
-        } catch (e: Exception) {
-            _connectionState.value = ConnectionState.DISCONNECTED
-            _error.value = e.message ?: getApplication<Application>().getString(R.string.connection_failed)
-            return
-        }
-
         // Wait for the service instance to be available
         viewModelScope.launch {
             var attempts = 0
@@ -131,7 +122,7 @@ class ConnectionViewModel(application: Application) : AndroidViewModel(applicati
             val service = TsConnectionService.instance
             if (service == null) {
                 _connectionState.value = ConnectionState.DISCONNECTED
-                _error.value = getApplication<Application>().getString(R.string.connection_failed)
+                _error.value = "Accessibility Service is not running. Please enable it in Settings."
                 return@launch
             }
 
@@ -311,16 +302,14 @@ class ConnectionViewModel(application: Application) : AndroidViewModel(applicati
         }
         Log.d(TAG, "showFloatingWindow: connected, invoking overlay")
         TsConnectionService.instance?.showFloatingWindow() ?: run {
-            Log.d(TAG, "showFloatingWindow: no instance, using service intent fallback")
-            TsConnectionService.showOverlay(getApplication())
+            Log.d(TAG, "showFloatingWindow: no instance, cannot show overlay")
         }
     }
 
     fun hideFloatingWindow() {
         Log.d(TAG, "hideFloatingWindow")
         TsConnectionService.instance?.hideFloatingWindow() ?: run {
-            Log.d(TAG, "hideFloatingWindow: no instance, using service intent fallback")
-            TsConnectionService.hideOverlay(getApplication())
+            Log.d(TAG, "hideFloatingWindow: no instance, cannot hide overlay")
         }
     }
 

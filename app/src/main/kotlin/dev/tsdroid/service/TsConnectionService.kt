@@ -71,53 +71,11 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
 
     companion object {
         private const val TAG = "TsConnService"
-        private const val NOTIFICATION_ID = 1
-        private const val ACTION_DISCONNECT = "com.flammedemon.ts6droid.DISCONNECT"
-        private const val ACTION_TOGGLE_MUTE = "com.flammedemon.ts6droid.TOGGLE_MUTE"
-        private const val ACTION_SHOW_OVERLAY = "com.flammedemon.ts6droid.SHOW_OVERLAY"
-        private const val ACTION_HIDE_OVERLAY = "com.flammedemon.ts6droid.HIDE_OVERLAY"
 
         var instance: TsConnectionService? = null
             private set
-
-        fun start(context: Context) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(Intent(context, TsConnectionService::class.java))
-            } else {
-                context.startService(Intent(context, TsConnectionService::class.java))
-            }
-        }
-
-        fun stop(context: Context) {
-            context.stopService(Intent(context, TsConnectionService::class.java))
-        }
-
-        fun showOverlay(context: Context) {
-            val intent = Intent(context, TsConnectionService::class.java).apply { action = ACTION_SHOW_OVERLAY }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
-        }
-
-        fun hideOverlay(context: Context) {
-            val intent = Intent(context, TsConnectionService::class.java).apply { action = ACTION_HIDE_OVERLAY }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
-        }
     }
 
-    inner class LocalBinder : Binder() {
-        val tsClient: TsClient get() = this@TsConnectionService.tsClient
-        val audioBridge: AudioBridge get() = this@TsConnectionService.audioBridge
-        val service: TsConnectionService get() = this@TsConnectionService
-    }
-
-    private val binder = LocalBinder()
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     val tsClient = TsClient()
@@ -146,7 +104,6 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
 
     override fun onCreate() {
         super.onCreate()
-        instance = this
         savedStateRegistryController.performRestore(null)
         windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
         audioBridge = AudioBridge(applicationContext, tsClient)
@@ -186,7 +143,6 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
         tsClient.state.onEach { state ->
             overlayConnected = state == dev.tslib.ConnectionState.CONNECTED
             updateOverlayChannelName()
-            updateNotification()
         }.launchIn(serviceScope)
 
         tsClient.users.onEach {
@@ -199,35 +155,17 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
         }.launchIn(serviceScope)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
-            ACTION_DISCONNECT -> {
-                disconnect()
-                return START_NOT_STICKY
-            }
-            ACTION_TOGGLE_MUTE -> {
-                audioBridge.toggleMute()
-                updateNotification()
-                return START_STICKY
-            }
-            ACTION_SHOW_OVERLAY -> {
-                showFloatingWindow()
-                return START_STICKY
-            }
-            ACTION_HIDE_OVERLAY -> {
-                hideFloatingWindow()
-                return START_STICKY
-            }
-        }
-        startForeground(NOTIFICATION_ID, buildNotification())
-        return START_STICKY
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        Log.d(TAG, "Accessibility Service Successfully Handshaked by OS!")
+        
+        // 1. Establish the global singleton instance
+        instance = this
+        
+        // 2. Initialize and trigger the WindowManager injection immediately
+        // We don't show it immediately unless requested, but we can prepare it or just log.
+        // The actual showFloatingWindow() will be called by the ViewModel when connected.
     }
-
-    // AccessibilityService makes onBind final, so we cannot override it.
-    // We must return our binder from onStartCommand or use another mechanism if needed,
-    // but since we are an AccessibilityService, the system binds to it.
-    // If we need local binding, we can expose a static instance or use a different approach.
-    // For now, we'll remove the override.
 
     fun connect(address: String, identity: Identity, nickname: String, password: String?) {
         serviceScope.launch {
@@ -237,7 +175,6 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
             if (audioBridge.isMuted.value) {
                 tsClient.setInputMuted(true)
             }
-            updateNotification()
             // Start event loop
             launch { tsClient.eventLoop() }
         }
@@ -248,10 +185,6 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
         audioBridge.stopCapture()
         serviceScope.launch(Dispatchers.IO) {
             tsClient.disconnect()
-            withContext(Dispatchers.Main) {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
-            }
         }
     }
 
@@ -369,44 +302,6 @@ class TsConnectionService : AccessibilityService(), LifecycleOwner, ViewModelSto
         audioBridge.release()
         serviceScope.cancel()
         super.onDestroy()
-    }
-
-    private fun updateNotification() {
-        val manager = getSystemService(android.app.NotificationManager::class.java)
-        manager.notify(NOTIFICATION_ID, buildNotification())
-    }
-
-    private fun buildNotification(): Notification {
-        val contentIntent = PendingIntent.getActivity(
-            this, 0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-
-        val disconnectIntent = PendingIntent.getService(
-            this, 1,
-            Intent(this, TsConnectionService::class.java).apply { action = ACTION_DISCONNECT },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-
-        val muteIntent = PendingIntent.getService(
-            this, 2,
-            Intent(this, TsConnectionService::class.java).apply { action = ACTION_TOGGLE_MUTE },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-
-        val serverName = tsClient.serverInfo.value?.name ?: getString(R.string.connecting)
-        val muteLabel = getString(if (audioBridge.isMuted.value) R.string.notif_unmute else R.string.notif_mute)
-
-        return NotificationCompat.Builder(this, TsDroidApp.CHANNEL_ID_CONNECTION)
-            .setContentTitle(getString(R.string.app_name))
-            .setContentText(serverName)
-            .setSmallIcon(android.R.drawable.ic_btn_speak_now)
-            .setContentIntent(contentIntent)
-            .setOngoing(true)
-            .addAction(0, muteLabel, muteIntent)
-            .addAction(0, getString(R.string.disconnect), disconnectIntent)
-            .build()
     }
 
     @Composable
