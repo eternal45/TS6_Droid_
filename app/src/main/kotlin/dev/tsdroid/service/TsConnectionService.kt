@@ -49,6 +49,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import dev.tsdroid.MainActivity
 import dev.tsdroid.han.R
@@ -487,7 +488,7 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
             modifier = Modifier
                 .wrapContentSize()
                 .background(Color.Transparent) // Force the root container token to be 100% transparent
-                .androidx.compose.ui.layout.onSizeChanged { size -> onSizeChange(size.width, size.height) }
+                .onSizeChanged { size -> onSizeChange(size.width, size.height) }
         ) {
             if (!isExpanded) {
                 // --- COLLAPSED AVATAR BUBBLE ---
