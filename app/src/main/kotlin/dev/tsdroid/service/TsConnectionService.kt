@@ -65,6 +65,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -83,6 +84,7 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
         private const val NOTIFICATION_ID = 1
         private const val ACTION_DISCONNECT = "com.flammedemon.ts6droid.DISCONNECT"
         private const val ACTION_TOGGLE_MUTE = "com.flammedemon.ts6droid.TOGGLE_MUTE"
+        private const val SPEAKER_DELAY_MS = 500L
 
         var instance: TsConnectionService? = null
             private set
@@ -114,7 +116,6 @@ class TsConnectionService : LifecycleService(), ViewModelStoreOwner, SavedStateR
     // Delay mechanism for overlay speaker state changes
     private var pendingSpeakerId: Int? = null
     private var speakerUpdateJob: kotlinx.coroutines.Job? = null
-    private const val SPEAKER_DELAY_MS = 500L
     
     private lateinit var avatarCache: AvatarCache
 
