@@ -183,16 +183,12 @@ fun ConnectionScreen(
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.anime_background)) },
                                 onClick = {
-                                    languageMenuExpanded = false
+                                    scope.launch { settingsStore.setAnimeBackground(!animeBackground) }
                                 },
                                 trailingIcon = {
                                     Switch(
                                         checked = animeBackground,
-                                        onCheckedChange = {
-                                            kotlinx.coroutines.MainScope().launch {
-                                                settingsStore.setAnimeBackground(it)
-                                            }
-                                        }
+                                        onCheckedChange = { scope.launch { settingsStore.setAnimeBackground(it) } }
                                     )
                                 }
                             )
