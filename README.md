@@ -40,3 +40,13 @@
 ## 📄 开源许可
 
 本项目遵循原作者的自由软件开源协议。详细内容请参阅 [LICENSE](LICENSE) 文件。
+
+---
+
+## 👥 贡献者
+
+感谢所有为本项目做出贡献的开发者！
+
+<a href="https://github.com/YUAXI/TS6_Droid_CN/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=YUAXI/TS6_Droid_CN" />
+</a>
