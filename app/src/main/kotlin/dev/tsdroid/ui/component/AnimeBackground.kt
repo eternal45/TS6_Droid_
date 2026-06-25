@@ -47,7 +47,7 @@ fun AnimeBackground(enabled: Boolean) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .alpha(0.4f)
+            .alpha(0.65f)
     ) {
         AsyncImage(
             model = url,
@@ -62,9 +62,9 @@ fun AnimeBackground(enabled: Boolean) {
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.White.copy(alpha = 0.35f),
                             Color.White.copy(alpha = 0.15f),
-                            Color.White.copy(alpha = 0.35f),
+                            Color.White.copy(alpha = 0.05f),
+                            Color.White.copy(alpha = 0.15f),
                         )
                     )
                 )

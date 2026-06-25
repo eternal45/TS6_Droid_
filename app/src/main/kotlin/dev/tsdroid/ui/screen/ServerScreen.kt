@@ -206,6 +206,7 @@ fun ServerScreen(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = { Text(serverInfo?.name ?: stringResource(R.string.server)) },
