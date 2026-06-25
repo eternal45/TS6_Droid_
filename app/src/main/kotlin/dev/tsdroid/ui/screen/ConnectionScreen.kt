@@ -71,6 +71,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.tsdroid.han.R
 import dev.tslib.ConnectionState
+import dev.tsdroid.ui.component.AnimeBackground
 import dev.tsdroid.ui.component.ChannelTree
 import dev.tsdroid.viewmodel.ConnectionViewModel
 import kotlinx.coroutines.launch
@@ -105,6 +106,7 @@ fun ConnectionScreen(
     val context = LocalContext.current
     val activity = context as? androidx.activity.ComponentActivity
     val settingsStore = remember { SettingsStore(context) }
+    val animeBackground by settingsStore.animeBackground.collectAsState(initial = true)
     val languageOptions = listOf(
         "zh" to stringResource(R.string.language_simplified_chinese),
         "en" to stringResource(R.string.language_english),
@@ -210,127 +212,134 @@ fun ConnectionScreen(
                 },
             )
         }
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(padding),
         ) {
-            Spacer(Modifier.height(4.dp))
+            AnimeBackground(enabled = animeBackground)
 
-            // Auto-reconnect switch
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text(
-                    stringResource(R.string.auto_reconnect),
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f),
-                )
-                Switch(
-                    checked = autoReconnect,
-                    onCheckedChange = { viewModel.setAutoReconnect(it) },
-                )
-            }
+                Spacer(Modifier.height(4.dp))
 
-            // Bookmarks section
-            Text(
-                stringResource(R.string.bookmarks),
-                style = MaterialTheme.typography.titleMedium,
-            )
+                // Auto-reconnect switch
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        stringResource(R.string.auto_reconnect),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(
+                        checked = autoReconnect,
+                        onCheckedChange = { viewModel.setAutoReconnect(it) },
+                    )
+                }
 
-            if (bookmarks.isEmpty()) {
+                // Bookmarks section
                 Text(
-                    stringResource(R.string.no_bookmarks),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp),
+                    stringResource(R.string.bookmarks),
+                    style = MaterialTheme.typography.titleMedium,
                 )
-            } else {
-                bookmarks.forEachIndexed { index, bookmark ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+
+                if (bookmarks.isEmpty()) {
+                    Text(
+                        stringResource(R.string.no_bookmarks),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(vertical = 8.dp),
+                    )
+                } else {
+                    bookmarks.forEachIndexed { index, bookmark ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
-                            val icon = if (bookmark.iconId != 0L) bookmarkIcons[bookmark.iconId] else null
-                            if (icon != null) {
-                                Image(
-                                    bitmap = icon,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    contentScale = ContentScale.Fit,
-                                )
-                            } else {
-                                Icon(
-                                    Icons.Default.Star,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.primary,
-                                )
-                            }
-                            Spacer(Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    bookmark.serverName ?: bookmark.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                )
-                                Text(
-                                    bookmark.address,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            FilledTonalButton(
-                                onClick = { viewModel.connectBookmark(bookmark, onConnected) },
-                                enabled = !isConnecting,
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Text(stringResource(R.string.connect))
-                            }
-                            Box {
-                                var menuExpanded by remember { mutableStateOf(false) }
-                                IconButton(onClick = { menuExpanded = true }) {
-                                    Icon(
-                                        Icons.Default.MoreVert,
+                                val icon = if (bookmark.iconId != 0L) bookmarkIcons[bookmark.iconId] else null
+                                if (icon != null) {
+                                    Image(
+                                        bitmap = icon,
                                         contentDescription = null,
+                                        modifier = Modifier.size(32.dp),
+                                        contentScale = ContentScale.Fit,
+                                    )
+                                } else {
+                                    Icon(
+                                        Icons.Default.Star,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp),
+                                        tint = MaterialTheme.colorScheme.primary,
                                     )
                                 }
-                                DropdownMenu(
-                                    expanded = menuExpanded,
-                                    onDismissRequest = { menuExpanded = false },
+                                Spacer(Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        bookmark.serverName ?: bookmark.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                    )
+                                    Text(
+                                        bookmark.address,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                FilledTonalButton(
+                                    onClick = { viewModel.connectBookmark(bookmark, onConnected) },
+                                    enabled = !isConnecting,
                                 ) {
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.edit)) },
-                                        onClick = {
-                                            menuExpanded = false
-                                            viewModel.editBookmark(bookmark, index)
-                                            showBottomSheet = true
-                                        },
-                                        leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.remove)) },
-                                        onClick = {
-                                            menuExpanded = false
-                                            deleteConfirmIndex = index
-                                        },
-                                        leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
-                                    )
+                                    Text(stringResource(R.string.connect))
+                                }
+                                Box {
+                                    var menuExpanded by remember { mutableStateOf(false) }
+                                    IconButton(onClick = { menuExpanded = true }) {
+                                        Icon(
+                                            Icons.Default.MoreVert,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                    DropdownMenu(
+                                        expanded = menuExpanded,
+                                        onDismissRequest = { menuExpanded = false },
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.edit)) },
+                                            onClick = {
+                                                menuExpanded = false
+                                                viewModel.editBookmark(bookmark, index)
+                                                showBottomSheet = true
+                                            },
+                                            leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.remove)) },
+                                            onClick = {
+                                                menuExpanded = false
+                                                deleteConfirmIndex = index
+                                            },
+                                            leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
+            }
         }
 
         // Delete confirmation dialog

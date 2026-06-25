@@ -81,6 +81,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.tsdroid.han.R
 import dev.tslib.ConnectionState
 import dev.tslib.User
+import dev.tsdroid.ui.component.AnimeBackground
 import dev.tsdroid.ui.component.ChannelTree
 import dev.tsdroid.ui.component.ChatView
 import dev.tsdroid.ui.component.FileManagerDialog
@@ -115,6 +116,7 @@ fun ServerScreen(
     val showLinkThumbnails by viewModel.showLinkThumbnails.collectAsState()
     val autoLoadImages by viewModel.autoLoadImages.collectAsState()
     val enableFloatingWindow by viewModel.enableFloatingWindow.collectAsState()
+    val animeBackground by viewModel.animeBackground.collectAsState()
     val mutedUserIds by viewModel.mutedUserIds.collectAsState()
     val fileManagerOpen by viewModel.fileManagerOpen.collectAsState()
     val fileList by viewModel.fileList.collectAsState()
@@ -192,6 +194,8 @@ fun ServerScreen(
             onAutoLoadImagesChange = { viewModel.setAutoLoadImages(it) },
             enableFloatingWindow = enableFloatingWindow,
             onEnableFloatingWindowChange = { viewModel.setEnableFloatingWindow(it) },
+            animeBackground = animeBackground,
+            onAnimeBackgroundChange = { viewModel.setAnimeBackground(it) },
             onDismiss = { showSettings = false },
             onNavigateToAbout = onNavigateToAbout
         )
@@ -364,6 +368,8 @@ fun ServerScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            AnimeBackground(enabled = animeBackground)
+
             // Channel tree — full screen
             ChannelTree(
                 channels = channels,
@@ -715,6 +721,8 @@ private fun SettingsDialog(
     onAutoLoadImagesChange: (Boolean) -> Unit,
     enableFloatingWindow: Boolean,
     onEnableFloatingWindowChange: (Boolean) -> Unit,
+    animeBackground: Boolean,
+    onAnimeBackgroundChange: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onNavigateToAbout: () -> Unit,
 ) {
@@ -780,6 +788,21 @@ private fun SettingsDialog(
                     Switch(
                         checked = enableFloatingWindow,
                         onCheckedChange = onEnableFloatingWindowChange,
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.anime_background),
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(
+                        checked = animeBackground,
+                        onCheckedChange = onAnimeBackgroundChange,
                     )
                 }
                 Spacer(Modifier.height(16.dp))
