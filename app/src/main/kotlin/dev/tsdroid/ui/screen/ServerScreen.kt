@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -452,6 +453,7 @@ fun ServerScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .clipToBounds()
                         .graphicsLayer { translationY = size.height * chatProgress },
                 ) {
                     ChatPanel(
@@ -543,7 +545,7 @@ fun ChatPanel(
     }
     Surface(
         modifier = Modifier.fillMaxSize(),
-        tonalElevation = 3.dp,
+        color = Color.White.copy(alpha = 0.65f),
     ) {
         Column(
             modifier = Modifier
@@ -643,7 +645,7 @@ fun ChatPanel(
             // Whisper mode indicator
             if (isWhisperActive && whisperTargetName != null) {
                 Surface(
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
                 ) {
