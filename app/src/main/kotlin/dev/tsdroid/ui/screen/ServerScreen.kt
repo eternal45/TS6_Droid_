@@ -205,8 +205,11 @@ fun ServerScreen(
         )
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
+    Box(modifier = Modifier.fillMaxSize()) {
+        AnimeBackground(enabled = animeBackground)
+
+        Scaffold(
+            containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = { Text(serverInfo?.name ?: stringResource(R.string.server)) },
@@ -214,6 +217,7 @@ fun ServerScreen(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent,
                 ),
+                elevation = 0.dp,
                 actions = {
                     IconButton(onClick = { viewModel.toggleFileManager() }) {
                         Icon(Icons.Default.Folder, contentDescription = stringResource(R.string.file_manager))
@@ -228,15 +232,12 @@ fun ServerScreen(
             )
         },
         bottomBar = {
-            Surface(
-                color = Color.Transparent,
-                tonalElevation = 0.dp,
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -374,12 +375,8 @@ fun ServerScreen(
         },
     ) { padding ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
+            modifier = Modifier.fillMaxSize(),
         ) {
-            AnimeBackground(enabled = animeBackground)
-
             // Channel tree — full screen
             ChannelTree(
                 channels = channels,
@@ -850,4 +847,5 @@ private fun SettingsDialog(
             }
         },
     )
+    }
 }

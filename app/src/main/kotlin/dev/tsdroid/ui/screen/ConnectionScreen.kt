@@ -148,8 +148,11 @@ fun ConnectionScreen(
         }
     }
 
-    Scaffold(
-        containerColor = Color.Transparent,
+    Box(modifier = Modifier.fillMaxSize()) {
+        AnimeBackground(enabled = animeBackground)
+
+        Scaffold(
+            containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
@@ -157,6 +160,7 @@ fun ConnectionScreen(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent,
                 ),
+                elevation = 0.dp,
                 actions = {
                     Box {
                         TextButton(onClick = { languageMenuExpanded = true }) {
@@ -229,8 +233,6 @@ fun ConnectionScreen(
                 .fillMaxSize()
                 .padding(padding),
         ) {
-            AnimeBackground(enabled = animeBackground)
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -528,5 +530,6 @@ fun ConnectionScreen(
                 }
             }
         }
+    }
     }
 }
