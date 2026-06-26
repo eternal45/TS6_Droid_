@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,19 +40,19 @@ fun SettingsPage(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val settingsStore = remember { SettingsStore(context) }
-    val showLinkThumbnails by settingsStore.showLinkThumbnails.collectAsState(initial = false)
-    val autoLoadImages by settingsStore.autoLoadImages.collectAsState(initial = true)
-    val enableFloatingWindow by settingsStore.enableFloatingWindow.collectAsState(initial = false)
-    val animeBackground by settingsStore.animeBackground.collectAsState(initial = true)
-    val noiseSuppression by settingsStore.noiseSuppression.collectAsState(initial = true)
-    val audioGain by settingsStore.audioGain.collectAsState(initial = 1.0f)
+    val showLinkThumbnails by settingsStore.showLinkThumbnails.collectAsStateWithLifecycle(initialValue = false)
+    val autoLoadImages by settingsStore.autoLoadImages.collectAsStateWithLifecycle(initialValue = true)
+    val enableFloatingWindow by settingsStore.enableFloatingWindow.collectAsStateWithLifecycle(initialValue = false)
+    val animeBackground by settingsStore.animeBackground.collectAsStateWithLifecycle(initialValue = true)
+    val noiseSuppression by settingsStore.noiseSuppression.collectAsStateWithLifecycle(initialValue = true)
+    val audioGain by settingsStore.audioGain.collectAsStateWithLifecycle(initialValue = 1.0f)
 
     val languageOptions = listOf(
         "zh" to stringResource(R.string.language_simplified_chinese),
         "en" to stringResource(R.string.language_english),
         "fr" to stringResource(R.string.language_french),
     )
-    val selectedLanguageTag by settingsStore.language.collectAsState(initial = "zh")
+    val selectedLanguageTag by settingsStore.language.collectAsStateWithLifecycle(initialValue = "zh")
     val selectedLanguageLabel = languageOptions.firstOrNull { it.first == selectedLanguageTag }?.second
         ?: stringResource(R.string.language_simplified_chinese)
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -273,7 +274,7 @@ fun SettingsPage(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 verticalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
-                                items(cachedFiles.size) { index ->
+                                items(cachedFiles.size, key = { cachedFiles[it].name }) { index ->
                                     val file = cachedFiles[index]
                                     Box(
                                         modifier = Modifier
@@ -417,15 +418,91 @@ fun SettingsPage(
 
         Spacer(Modifier.height(32.dp))
 
-        // Version info
+        // Version info + update check
         val versionName = try {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
         } catch (_: Exception) { "" }
-        Text(
-            text = "TS6 Droid v$versionName",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-        )
+        var isCheckingUpdate by remember { mutableStateOf(false) }
+        var updateInfo by remember { mutableStateOf<dev.tsdroid.update.UpdateInfo?>(null) }
+        var showUpdateDialog by remember { mutableStateOf(false) }
+
+        if (showUpdateDialog && updateInfo != null) {
+            AlertDialog(
+                onDismissRequest = { showUpdateDialog = false },
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                title = { Text(stringResource(R.string.update_available, updateInfo!!.versionName)) },
+                text = {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        val changelog = updateInfo!!.changelog
+                        val displayText = changelog.take(2000)
+                        Text(
+                            text = displayText.ifBlank { stringResource(R.string.update_no_changelog) },
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        if (changelog.length > 2000) {
+                            Text("...", style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                },
+                confirmButton = {
+                    FilledTonalButton(onClick = {
+                        showUpdateDialog = false
+                        dev.tsdroid.update.UpdateChecker.openDownload(context, updateInfo!!.downloadUrl)
+                    }) {
+                        Text(stringResource(R.string.update_download))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showUpdateDialog = false }) {
+                        Text(stringResource(R.string.update_later))
+                    }
+                },
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    if (!isCheckingUpdate) {
+                        isCheckingUpdate = true
+                        scope.launch {
+                            val result = dev.tsdroid.update.UpdateChecker.checkForUpdate(versionName)
+                            updateInfo = result
+                            if (result != null) {
+                                showUpdateDialog = true
+                            }
+                            isCheckingUpdate = false
+                        }
+                    }
+                }
+                .padding(vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "TS6 Droid v$versionName",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            if (isCheckingUpdate) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                )
+            } else if (updateInfo != null) {
+                Text(
+                    text = stringResource(R.string.update_found),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.update_check),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
     }
 }

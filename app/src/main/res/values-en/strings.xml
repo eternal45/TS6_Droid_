@@ -49,6 +49,12 @@
     <string name="wallpaper_clear_cache_confirm">Are you sure you want to clear all wallpaper cache? This cannot be undone.</string>
     <string name="wallpaper_cache_empty">No cached wallpapers</string>
     <string name="confirm">Confirm</string>
+    <string name="update_check">Check for updates</string>
+    <string name="update_found">New version available</string>
+    <string name="update_available">New version %1$s available</string>
+    <string name="update_download">Update now</string>
+    <string name="update_later">Later</string>
+    <string name="update_no_changelog">No changelog available</string>
     <string name="close">Close</string>
     <string name="filter_all">All</string>
     <string name="message_channel_placeholder">Channel message\u2026</string>
