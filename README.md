@@ -25,7 +25,7 @@
 
 ## 更新日志
 
-### v2.0.1-Han（2026-06-27）
+### v2.0.1-Han（2026-06-26）
 
 **Compose 性能优化**
 - 全项目 54 处 Flow 采集从 `collectAsState` 迁移至 `collectAsStateWithLifecycle`，应用切后台时自动暂停 UI 采集，降低 CPU 占用和电量消耗
