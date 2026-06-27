@@ -324,6 +324,12 @@ class ServerViewModel(application: Application) : AndroidViewModel(application) 
             }
             // Apply persisted audio gain
             service.audioBridge.gainFactor = audioGain.value
+            // Observe audio gain changes and apply live
+            viewModelScope.launch {
+                audioGain.collect { gain ->
+                    service.audioBridge.gainFactor = gain
+                }
+            }
             // Observe audio state for local talking status
             viewModelScope.launch {
                 service.audioBridge.isLocalVoiceActive.collect { _isLocalTalking.value = it }

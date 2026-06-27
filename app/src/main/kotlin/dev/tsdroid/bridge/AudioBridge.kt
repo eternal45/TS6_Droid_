@@ -151,6 +151,8 @@ class AudioBridge(
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to create NoiseSuppressor", e)
             }
+        } else {
+            Log.i(TAG, "NoiseSuppressor skipped: enabled=$noiseSuppressionEnabled, available=${NoiseSuppressor.isAvailable()}")
         }
 
         captureJob = scope.launch(Dispatchers.IO) {
