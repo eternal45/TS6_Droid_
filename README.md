@@ -104,6 +104,25 @@
 
 ---
 
+## 多电脑编译签名说明
+
+本项目使用统一的 `release.keystore` 签名文件，确保所有电脑编译的 APK 签名一致，覆盖安装时不报签名冲突。
+
+- 签名文件位于项目根目录 `release.keystore`
+- 密码/别名：`ts6droid`
+- 该文件已被 `.gitignore` 排除，不会提交到 GitHub
+- 多电脑协作时，将 `release.keystore` 复制到其他电脑的项目根目录即可
+
+### 生成新的签名文件
+
+如需替换签名（例如用于正式发布），在项目根目录执行：
+
+```bash
+keytool -genkey -v -keystore release.keystore -alias ts6droid -keyalg RSA -keysize 2048 -validity 10000
+```
+
+---
+
 ## 如何进行云编译 (GitHub Actions)
 
 1. **Fork 本仓库** 到你自己的 GitHub 账号下。
