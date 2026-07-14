@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App -->
+    <string name="app_name">TS6 Droid</string>
+    <string name="language_simplified_chinese">简体中文</string>
+    <string name="language_english">English</string>
+    <string name="language_french">Français</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_change_title">Сменить язык?</string>
+    <string name="language_change_message">Для применения %1$s требуется перезапуск приложения.</string>
+    <string name="restart">Перезапустить</string>
+    <string name="mute_user">Отключить звук</string>
+    <string name="unmute_user">Включить звук</string>
+    <string name="user_muted">Звук отключен</string>
+    <string name="channel_connection">Подключение</string>
+    <string name="channel_connection_desc">Уведомление о подключении к серверу</string>
+    <string name="accessibility_service_desc">Глобальный контроллер голоса TeamSpeak 6</string>
+
+    <!-- ConnectionScreen -->
+    <string name="server_address">Адрес сервера</string>
+    <string name="server_address_placeholder">localhost:9987</string>
+    <string name="nickname">Никнейм</string>
+    <string name="password_optional">Пароль (необязательно)</string>
+    <string name="channel_optional">Канал (необязательно)</string>
+    <string name="default_channel">Канал по умолчанию</string>
+    <string name="browse_channels">Обзор каналов</string>
+    <string name="connecting">Подключение\u2026</string>
+    <string name="connect">Подключиться</string>
+    <string name="add_bookmark">Добавить сервер</string>
+    <string name="edit_bookmark">Изменить сервер</string>
+    <string name="save">Сохранить</string>
+    <string name="bookmarks">Серверы</string>
+    <string name="no_bookmarks">Нет серверов</string>
+    <string name="manual_connection">Ручное подключение</string>
+    <string name="auto_reconnect">Автопереподключение</string>
+    <string name="remove">Удалить</string>
+    <string name="edit">Изменить</string>
+    <string name="select_channel">Выбрать канал</string>
+    <string name="cancel">Отмена</string>
+
+    <!-- ServerScreen -->
+    <string name="server">Сервер</string>
+    <string name="disconnect">Отключиться</string>
+    <string name="settings">Настройки</string>
+    <string name="audio_gain">Усиление звука</string>
+    <string name="audio_gain_value">×%1$.1f</string>
+    <string name="show_link_thumbnails">Превью для видеоссылок</string>
+    <string name="auto_load_images">Автозагрузка изображений</string>
+    <string name="enable_floating_window">Плавающее окно</string>
+    <string name="anime_background">Аниме-фон</string>
+    <string name="noise_suppression">Шумоподавление микрофона</string>
+    <string name="chat">Чат</string>
+    <string name="push_to_talk">Нажми, чтобы говорить</string>
+    <string name="ptt">PTT</string>
+    <string name="mute_mic">Выключить микрофон</string>
+    <string name="mute">Выкл. звук</string>
+    <string name="unmute_mic">Включить микрофон</string>
+    <string name="tab_channel">Канал</string>
+    <string name="tab_private">ЛС</string>
+    <string name="tab_home">Главная</string>
+    <string name="tab_settings">Настройки</string>
+    <string name="no_connection">Нет подключений</string>
+    <string name="wallpaper_cache_size">Кэш фонов: %1$s МБ (%2$d шт.)</string>
+    <string name="wallpaper_max_cache">Макс. кэш: %1$d МБ</string>
+    <string name="wallpaper_view_cache">Посмотреть кэш фонов</string>
+    <string name="wallpaper_cache_images">фонов</string>
+    <string name="wallpaper_clear_cache">Очистить кэш фонов</string>
+    <string name="wallpaper_clear_cache_confirm">Вы уверены, что хотите очистить весь кэш фонов? Это действие необратимо.</string>
+    <string name="wallpaper_cache_empty">Кэш фонов пуст</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="update_check">Проверить обновления</string>
+    <string name="update_found">Доступна новая версия</string>
+    <string name="update_already_latest">Установлена последняя версия</string>
+    <string name="update_available">Доступна новая версия %1$s</string>
+    <string name="update_download">Обновить</string>
+    <string name="update_downloading">Загрузка\u2026</string>
+    <string name="update_later">Позже</string>
+    <string name="update_no_changelog">Список изменений отсутствует</string>
+    <string name="close">Закрыть</string>
+    <string name="filter_all">Все</string>
+    <string name="message_channel_placeholder">Сообщение в канал\u2026</string>
+    <string name="message_private_placeholder">Сообщение для %1$s\u2026</string>
+    <string name="send">Отправить</string>
+    <string name="user_fallback">Пользователь #%1$d</string>
+
+    <!-- UserItem -->
+    <string name="status_recording">Запись</string>
+    <string name="status_talking">Говорит</string>
+    <string name="status_muted">Микрофон выкл.</string>
+    <string name="status_output_muted">Звук выкл.</string>
+    <string name="status_away">Отошел</string>
+
+    <!-- MessageBubble -->
+    <string name="image">Изображение</string>
+    <string name="file_attachment_info">%1$s \u00B7 Отправленный файл</string>
+    <string name="file_attachment_server">%1$s \u00B7 Файл сервера</string>
+    <string name="download_not_supported">Загрузка не поддерживается</string>
+    <string name="tap_to_download">Нажмите для загрузки</string>
+    <string name="tap_to_view">Нажмите для просмотра</string>
+    <string name="tap_to_open">Нажмите, чтобы открыть</string>
+    <string name="downloading">Загрузка\u2026</string>
+    <string name="download">Скачать</string>
+    <string name="file_saved_label">Сохранено в Загрузки</string>
+    <string name="file_saved">%1$s сохранен</string>
+    <string name="attach_file">Прикрепить файл</string>
+    <string name="file_size_bytes">%1$d Б</string>
+    <string name="file_size_kb">%1$.1f КБ</string>
+    <string name="file_size_mb">%1$.1f МБ</string>
+    <string name="file_size_gb">%1$.1f ГБ</string>
+
+    <!-- File Manager -->
+    <string name="file_manager">Файлы</string>
+    <string name="no_files">Нет файлов</string>
+    <string name="new_folder">Новая папка</string>
+    <string name="rename">Переименовать</string>
+    <string name="delete_file">Удалить</string>
+    <string name="confirm_delete">Удалить %1$s?</string>
+    <string name="enter_folder_name">Имя папки</string>
+    <string name="enter_new_name">Новое имя</string>
+    <string name="refresh">Обновить</string>
+    <string name="create">Создать</string>
+    <string name="folder">Папка</string>
+    <string name="upload">Загрузить</string>
+    <string name="share_in_channel">Текущий канал</string>
+    <string name="share_file_title">Поделиться %1$s</string>
+
+    <!-- Notification -->
+    <string name="notif_unmute">Вкл. звук</string>
+    <string name="notif_mute">Выкл. звук</string>
+
+    <!-- ViewModel -->
+    <string name="unknown_sender">Неизвестно</string>
+    <string name="me_sender">Я</string>
+    <string name="error_address_nickname_required">Адрес и никнейм обязательны</string>
+    <string name="connection_failed">Ошибка подключения</string>
+    <string name="browse_failed">Не удалось получить список каналов</string>
+
+    <!-- AboutScreen -->
+    <string name="about_software">О программе / About</string>
+    <string name="about_back">← Назад</string>
+    <string name="about_credits_title">Благодарности и источники</string>
+    <string name="about_credits_desc">Этот проект основан на отличном open-source коде от Grégory D, с глубокой локализацией и улучшениями. Искренняя благодарность оригинальному автору за его выдающийся вклад в open-source голосовое сообщество!</string>
+    <string name="about_enhancement_title">Заявление о локализации и улучшениях</string>
+    <string name="about_enhancement_desc">Эта версия включает полный перевод на китайский от yuaxi (и адаптацию под другие языки), а также глобальный рефакторинг кода совместимости системы для устранения вылетов в фоне. Кроме того, для сценариев тактической голосовой связи на мобильных устройствах была добавлена [Минималистичная полупрозрачная плавающая консоль], значительно улучшающая взаимодействие с микрофоном во время игр.</string>
+    <string name="about_license_title">Лицензия Open Source (GPLv3)</string>
+    <string name="about_license_desc">Этот проект строго следует лицензии GNU GPLv3. Это означает, что любые модификации или производные продукты ДОЛЖНЫ оставаться полностью открытыми, безусловно использовать GPLv3 и сохранять авторство оригинального автора (Grégory D) и разработчика локализации (yuaxi). Любая форма закрытого распространения или извлечения прибыли строго запрещена!</string>
+    <string name="about_repo_title">Официальный репозиторий и обновления</string>
+    <string name="about_repo_desc">Полный исходный код этого проекта, последующие итерации функций, оптимизации и исправления ошибок публикуются в моем официальном репозитории GitHub. Вы можете добавить звезду (Star), подписаться, сообщить о проблеме (Issue) или отправить PR:</string>
+    <string name="about_repo_link">🔗 Нажмите, чтобы посетить GitHub репозиторий yuaxi</string>
+    <string name="about_warning_title">⚠️ Осторожно, мошенники!</string>
+    <string name="about_warning_desc">Эта программа является полностью бесплатным и открытым продуктом для некоммерческого обмена техническим опытом! Любая форма коммерческой продажи или взимания платы запрещена. Если вы получили это ПО через платные каналы, вас обманули! Пожалуйста, немедленно запросите возврат средств и сообщите о мошенниках.</string>
+    <string name="about_contributors_title">Участники</string>
+    <string name="about_contributions_count">Вкладов: %1$d</string>
+    <string name="contributors_load_error">Ошибка загрузки</string>
+</resources>
